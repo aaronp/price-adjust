@@ -25,5 +25,6 @@ class SearchMainTest extends WordSpec with ElasticSugar with ScalaFutures with M
     }
   }
 
-  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(2, Seconds)), interval = scaled(Span(150, Millis)))
+  // Travis CI is quite slow
+  implicit override val patienceConfig = PatienceConfig(timeout = scaled(Span(10, Seconds)), interval = scaled(Span(150, Millis)))
 }
