@@ -4,14 +4,17 @@ version := "0.0.1"
 
 scalaVersion := "2.11.7"
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
-
 lazy val common = project.
     settings(Common.settings: _*)
 
 lazy val api = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.apiDependencies)
+
+lazy val apiJson = project.
+    in(file("api-json")).
+    settings(Common.settings: _*).
+    settings(libraryDependencies ++= Dependencies.apiJsonDependencies)
 
 lazy val client = project.
     dependsOn(api).
@@ -39,5 +42,17 @@ lazy val search = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.searchDependencies)
 
+lazy val domainDao = project.
+    in(file("domain-dao")).
+    dependsOn(domain, common).
+    settings(Common.settings: _*).
+    settings(libraryDependencies ++= Dependencies.domainDaoDependencies)
+
+lazy val domainJson = project.
+    in(file("domain-json")).
+    dependsOn(domain, common).
+    settings(Common.settings: _*).
+    settings(libraryDependencies ++= Dependencies.domainJsonDependencies)
+
 lazy val root = (project in file(".")).
-    aggregate(api, common, client, domain, web, search, spark)
+    aggregate(api, common, client, domain, domainJson, domainDao, web, search, spark)
