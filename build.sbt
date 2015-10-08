@@ -66,4 +66,4 @@ lazy val domainJson = project.
     settings(libraryDependencies ++= Dependencies.domainJsonDependencies)
 
 lazy val root = (project in file(".")).
-    aggregate(api, common, client, domain, domainJson, domainDao, web, search, spark)
+    aggregate(api, common, client, domain, domainJson, domainDao, web, search, spark, neo)
