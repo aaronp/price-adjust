@@ -4,8 +4,8 @@ import java.util.UUID
 
 trait TestData {
 
-  lazy val someAddress = Address("Some address", "Somewhere", Some("Main St"), None, "UK", "AB1 2CD")
-  lazy val someEmployee = Employee(UUID.randomUUID(), "Dave", someAddress)
-  lazy val someBusiness = Business(UUID.randomUUID, "some business", Set(someEmployee), someAddress)
+  def newAddress = Address(UUID.randomUUID(), "Some address", "Somewhere", Some("Main St"), None, "UK", "AB1 2CD")
+  def newEmployee = Employee(UUID.randomUUID(), "Dave", newAddress)
+  def newBusiness = Business(UUID.randomUUID, "some business", Set(newEmployee), newAddress)
 
 }

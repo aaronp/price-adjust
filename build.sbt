@@ -42,11 +42,22 @@ lazy val search = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.searchDependencies)
 
+lazy val neo = project.in(file("neo")).
+  in(file("neo")).
+  settings(Common.settings: _*).
+  settings(libraryDependencies ++= Dependencies.neoDependencies)
+
 lazy val domainDao = project.
     in(file("domain-dao")).
-    dependsOn(domain, common).
+    dependsOn(domain, common, neo).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.domainDaoDependencies)
+
+lazy val avro = project.
+    in(file("domain-avro")).
+    dependsOn(domain, common).
+    settings(Common.settings: _*).
+    settings(libraryDependencies ++= Dependencies.avroDependencies)
 
 lazy val domainJson = project.
     in(file("domain-json")).

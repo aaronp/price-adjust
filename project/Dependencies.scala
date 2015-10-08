@@ -20,13 +20,10 @@ object Dependencies {
       "com.propensive" %% "rapture-json-argonaut" % "1.1.0",
       "com.typesafe.play" %% "play-json" % "2.4.2")
 
-  val dao : Seq[ModuleID] = Seq(
-    "org.mongodb" %% "casbah" % "2.8.2",
-    "com.github.fakemongo" % "fongo" % "2.0.1" % "test",
-    "org.anormcypher" %% "anormcypher" % "0.6.0"
-    // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
-    // "eu.fakod" %% "neo4j-scala" % "0.3.0"
-    )
+
+  val avroDependencies   : Seq[ModuleID] = commonDependencies ++ Seq(
+    "com.sksamuel.avro4s" %% "avro4s-core" % "0.94.0"
+  )
 
   val apiDependencies    : Seq[ModuleID] = commonDependencies
   val domainDependencies : Seq[ModuleID] = commonDependencies
@@ -37,7 +34,16 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % "1.7.0" % "test"
   )
   val domainJsonDependencies : Seq[ModuleID] = commonDependencies ++ json
-  val domainDaoDependencies : Seq[ModuleID] = commonDependencies ++ dao
+  val domainDaoDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
+    "org.mongodb" %% "casbah" % "2.8.2",
+    "com.github.fakemongo" % "fongo" % "2.0.1" % "test",
+    "org.anormcypher" %% "anormcypher" % "0.6.0"
+    // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
+    // "eu.fakod" %% "neo4j-scala" % "0.3.0"
+  )
+  val neoDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+    "org.anormcypher" %% "anormcypher" % "0.6.0"
+  )
 
   val sparkDependencies  : Seq[ModuleID] = commonDependencies ++ Seq(
     "org.apache.spark" %% "spark-core" % sparkVersion,
