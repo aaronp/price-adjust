@@ -4,5 +4,5 @@ import Keys._
 object MyBuild extends Build {
   import Dependencies._
 
-  val NamePrefix = "MyProject-"
+  val NamePrefix = "MultiProject-"
 }

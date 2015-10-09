@@ -42,8 +42,7 @@ lazy val search = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.searchDependencies)
 
-lazy val neo = project.in(file("neo")).
-  in(file("neo")).
+lazy val neo = project.
   settings(Common.settings: _*).
   settings(libraryDependencies ++= Dependencies.neoDependencies)
 
@@ -66,4 +65,4 @@ lazy val domainJson = project.
     settings(libraryDependencies ++= Dependencies.domainJsonDependencies)
 
 lazy val root = (project in file(".")).
-    aggregate(api, common, client, domain, domainJson, domainDao, web, search, spark, neo)
+    aggregate(api, common, neo, client, domain, domainJson, domainDao, web, search, spark)
