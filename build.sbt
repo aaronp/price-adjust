@@ -53,12 +53,6 @@ lazy val domainDao = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.domainDaoDependencies)
 
-//lazy val avro = project.
-//    in(file("domain-avro")).
-//    dependsOn(domain, common).
-//    settings(Common.settings: _*).
-//    settings(libraryDependencies ++= Dependencies.avroDependencies)
-
 lazy val domainJson = project.
     in(file("domain-json")).
     dependsOn(domain, common).

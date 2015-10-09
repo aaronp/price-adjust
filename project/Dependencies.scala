@@ -20,11 +20,6 @@ object Dependencies {
       "com.propensive" %% "rapture-json-argonaut" % "1.1.0",
       "com.typesafe.play" %% "play-json" % "2.4.2")
 
-
-  val avroDependencies   : Seq[ModuleID] = commonDependencies ++ Seq(
-    "com.sksamuel.avro4s" %% "avro4s-core" % "0.94.0"
-  )
-
   val apiDependencies    : Seq[ModuleID] = commonDependencies
   val domainDependencies : Seq[ModuleID] = commonDependencies
   val clientDependencies : Seq[ModuleID] = commonDependencies
