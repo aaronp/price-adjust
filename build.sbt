@@ -55,7 +55,7 @@ lazy val domainDao = project.
 
 lazy val domainJson = project.
     in(file("domain-json")).
-    dependsOn(domain, common).
+    dependsOn(domain % "test->test;compile->compile", common).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.domainJsonDependencies)
 

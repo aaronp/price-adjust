@@ -1,4 +1,4 @@
-package domain.dao.neo
+package neo
 
 import com.typesafe.config.Config
 import org.anormcypher.Neo4jREST

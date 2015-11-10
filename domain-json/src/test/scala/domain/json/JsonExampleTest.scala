@@ -28,7 +28,7 @@ class JsonExampleTest extends WordSpec with TestData with Matchers with BeforeAn
       }
 
       implicit def addressCodecJson: CodecJson[Address] = {
-        casecodec6(Address.apply, Address.unapply)("name", "street", "line1", "line2", "country", "zip-code")
+        casecodec7(Address.apply, Address.unapply)("id", "name", "street", "line1", "line2", "country", "zip-code")
       }
 
       implicit def employeeCodecJson: CodecJson[Employee] = {
@@ -51,7 +51,8 @@ class JsonExampleTest extends WordSpec with TestData with Matchers with BeforeAn
         casecodec4(fromValues, unapply)("id", "name", "employees", "address")
       }
 
-      val json = businessJson.encode(someBusiness)
+      val expectedBusiness = newBusiness
+      val json = businessJson.encode(expectedBusiness)
 
       println("Argonaut JSON:")
       println(json.pretty(PrettyParams.spaces2))
@@ -59,7 +60,7 @@ class JsonExampleTest extends WordSpec with TestData with Matchers with BeforeAn
       val backAgainResult: DecodeResult[Business] = businessJson.decodeJson(json)
 
       val Some(backAgain) = backAgainResult.value
-      backAgain should equal(someBusiness)
+      backAgain should equal(expectedBusiness)
 
     }
 
@@ -74,14 +75,15 @@ class JsonExampleTest extends WordSpec with TestData with Matchers with BeforeAn
       implicit val employeeJsonFmt = Json.format[Employee]
       implicit val businessJsonFmt = Json.format[Business]
 
-      val json = Json.prettyPrint(businessJsonFmt.writes(someBusiness))
+      val expectedBusiness = newBusiness
+      val json = Json.prettyPrint(businessJsonFmt.writes(expectedBusiness))
       println("Play JSON:")
       println(json)
 
       val backAgainResult: JsResult[Business] = businessJsonFmt.reads(Json.parse(json))
 
       val JsSuccess(backAgain, _) = backAgainResult
-      backAgain should equal(someBusiness)
+      backAgain should equal(expectedBusiness)
     }
   }
 }
