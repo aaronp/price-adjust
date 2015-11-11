@@ -63,11 +63,10 @@ object NeoDao {
 
     def update(nodes: Seq[NodeRecord]) = {
 
-
-      val nodeStatements = nodes.map {
+      val nodeStatements: Seq[Boolean] = nodes.map {
         case NodeRecord(id, labels, properties) =>
-          val formattedProperties = properties.mapValues(CypherFormatter.formatField)
-          val params = Map("props", formattedProperties)
+          val formattedProperties: Map[String, String] = properties.mapValues(CypherFormatter.formatField)
+          val params: Map[String, Any] = Map("props" -> formattedProperties)
           val statement = CypherStatement(
             s"""
                |MATCH (n {_id : "${id}"})
@@ -76,8 +75,8 @@ object NeoDao {
             """.stripMargin, params)
             statement.execute()
       }
-      val r = nodeStatements
-      require(r)
+      val r: Seq[Boolean] = nodeStatements
+      require(r.forall(_.booleanValue()))
     }
 
     def create(nodes: Seq[NodeRecord]) = {
@@ -91,12 +90,27 @@ object NeoDao {
 
       val names = indexByUUID.values.map("n" + _).mkString(",")
 
-      val query = indexByUUID.map {
+      val query: String = indexByUUID.map {
         case (id, idx) ⇒ s"""(n${idx} {_id : "${id}"}) """
       }.mkString("MATCH ", ", ", s" RETURN ${names}")
 
+      println(query)
+      val results: Stream[CypherResultRow] = CypherStatement(query)()
 
+      println(results.size)
+      results.map { row =>
+        val data = row.data
 
+        val md = row.metaData
+
+        val map = row.asMap
+
+        println(map)
+        println(data)
+        val id = map("_id")
+
+        ???
+      }
       ???
     }
 
