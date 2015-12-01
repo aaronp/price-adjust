@@ -5,6 +5,7 @@ import java.util.UUID
 
 case class NodeRecord(id: UUID, labels: Set[String], properties: Map[String, NodeField]) {
   def withLabel(label : String) = copy(labels = labels + label)
+  def withLabels(first : String, theRest : String*) = copy(labels = labels ++ theRest + first)
   def +(key: String, value: String) = withProperty(key -> StringField(value))
   def +(key: String, value: Long) = withProperty(key -> LongField(value))
   def withProperty(keyValue: (String, NodeField)) = copy(properties = properties.updated(keyValue._1, keyValue._2))
@@ -20,6 +21,16 @@ case class NodeRelationship(fromNodeId: UUID, toNodeId: UUID, label: Option[Stri
 sealed trait NodeField
 
 object NodeField {
+  def unapply(owt : Any) : Option[NodeField] = {
+    owt match {
+      case x : String => Option(apply(x))
+      case x : BigDecimal if x.isValidLong => Option(apply(x.longValue))
+      case x : BigDecimal => Option(apply(x))
+      case x : Long => Option(apply(x))
+      case _ => None
+    }
+  }
+  def apply(s : BigDecimal) = DecimalField(s)
   def apply(s : String) = StringField(s)
   def apply(i : Long) = LongField(i)
 }

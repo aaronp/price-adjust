@@ -5,6 +5,7 @@ object Dependencies {
 
   val slf4jVersion = "1.6.4"
   val slf4jNop = "org.slf4j" % "slf4j-nop" % slf4jVersion
+  val sparkVersion = "1.4.1"
 
   val commonDependencies: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % "2.2.4" % "test",
@@ -13,8 +14,6 @@ object Dependencies {
     "junit" % "junit" % "4.12" % "test"
   )
 
-  val sparkVersion = "1.4.1"
-  
   val json : Seq[ModuleID] = Seq(
       "io.argonaut" %% "argonaut" % "6.0.4",
       "com.propensive" %% "rapture-json-argonaut" % "1.1.0",

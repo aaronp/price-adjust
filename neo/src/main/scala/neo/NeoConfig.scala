@@ -2,9 +2,13 @@ package neo
 
 import com.typesafe.config.Config
 import org.anormcypher.Neo4jREST
+import org.slf4j.LoggerFactory
 
 case class NeoConfig(host: String, port: Int, path: String, username: String, password: String, cypherEndpoint: String, https: Boolean) {
+  private lazy val logger = LoggerFactory.getLogger(getClass)
   def newRestClient: Neo4jREST = {
+    println(s"Creating a new REST client against ${copy(password="*****")}")
+
     Neo4jREST(host = host,
       port = port,
       path = path,

@@ -4,6 +4,7 @@ import java.util.UUID
 
 import com.typesafe.config.Config
 import neo.CypherOps._
+import neo.NodeField
 import org.anormcypher._
 
 import scala.compat.Platform.EOL
@@ -16,9 +17,9 @@ trait NeoDao {
 
   def save(nodes: Seq[NodeRecord], relationships: Seq[NodeRelationship]): Unit
 
-  def save(first: NodeRecord, theRest: NodeRecord*): Unit = save(first +: theRest.toSeq, Nil)
+  final def save(first: NodeRecord, theRest: NodeRecord*): Unit = save(first +: theRest.toSeq, Nil)
 
-  def save(first: NodeRelationship, theRest: NodeRelationship*): Unit = save(Nil, first +: theRest.toSeq)
+  final def save(first: NodeRelationship, theRest: NodeRelationship*): Unit = save(Nil, first +: theRest.toSeq)
 }
 
 object NeoDao {
@@ -31,22 +32,13 @@ object NeoDao {
     private implicit val c = neoClient
 
     private val SingleLineParser = CypherRowParser[NodeRecord] { row =>
-
-
-
-      val keys = row.asMap.keySet
-
-      println(keys)
-
-        val props = row.propertiesFor("n")
-        val StringField(idStr) = props(NodeRecord.IdColumnName)
-        val labels:Set[String] = row.labelsFor("n")
-
-        val propsSansId = props - NodeRecord.IdColumnName
-
-        val record = NodeRecord(UUID.fromString(idStr), labels, propsSansId)
-        Success(record)
-     }
+      val props = row.properties
+      val StringField(idStr) = props(NodeRecord.IdColumnName)
+      val labels = row.labels
+      val propsSansId = props - NodeRecord.IdColumnName
+      val record = NodeRecord(UUID.fromString(idStr), labels, propsSansId)
+      Success(record)
+    }
 
     override def save(nodes: Seq[NodeRecord], relationships: Seq[NodeRelationship]) = {
 
@@ -73,7 +65,7 @@ object NeoDao {
                |SET n = { props }
                |RETURN n
             """.stripMargin, params)
-            statement.execute()
+          statement.execute()
       }
       val r: Seq[Boolean] = nodeStatements
       require(r.forall(_.booleanValue()))
@@ -86,32 +78,25 @@ object NeoDao {
     }
 
     override def getNodesById(ids: Set[UUID]): Map[UUID, NodeRecord] = {
-      val indexByUUID: Map[UUID, Int] = ids.zipWithIndex.toMap
-
-      val names = indexByUUID.values.map("n" + _).mkString(",")
-
-      val query: String = indexByUUID.map {
-        case (id, idx) ⇒ s"""(n${idx} {_id : "${id}"}) """
-      }.mkString("MATCH ", ", ", s" RETURN ${names}")
-
-      println(query)
-      val results: Stream[CypherResultRow] = CypherStatement(query)()
-
-      println(results.size)
-      results.map { row =>
-        val data = row.data
-
-        val md = row.metaData
-
-        val map = row.asMap
-
-        println(map)
-        println(data)
-        val id = map("_id")
-
-        ???
+      val idByNodeName: Map[String, UUID] = ids.zipWithIndex.toMap.map {
+        case (id, i) => s"n$i" -> id
       }
-      ???
+
+
+      val results: Seq[NodeRecord] = {
+        val query: String = {
+          val names = idByNodeName.keySet.mkString(",")
+          idByNodeName.map {
+            case (name, id) ⇒ s"""($name {${NodeRecord.IdColumnName} : "${id}"}) """
+          }.mkString("MATCH ", ", ", s" RETURN ${names}")
+        }
+        println(query)
+
+        CypherStatement(query).list(SingleLineParser)
+      }
+
+      results.map(r => r.id -> r).toMap
+
     }
 
 

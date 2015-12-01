@@ -16,7 +16,7 @@ class NeoDaoTest extends WordSpec with Matchers with NeoImplicits {
       backAgain shouldBe node
     }
     "be able to update a node" in {
-      val originalNode = "updateMe".asNode.withLabel("original") + ("foo", "bar") + ("small", Long.MinValue) + ("big", Long.MaxValue)
+      val originalNode = "updateMe".asNode.withLabels("original", "test") + ("foo", "bar") + ("small", Long.MinValue) + ("big", Long.MaxValue)
       dao.save(originalNode)
       val updated = originalNode + ("x", "y")
       dao.save(updated)
@@ -29,13 +29,13 @@ class NeoDaoTest extends WordSpec with Matchers with NeoImplicits {
       val originalNode = "updateMe".asNode.withLabel("original") + ("foo", "bar") + ("small", Long.MinValue) + ("big", Long.MaxValue)
       dao.save(originalNode)
       val updated = originalNode.withLabel("updated") + ("x", "y")
-      dao.save(updated)
+      dao.save(updated.ensuring(_.labels == Set("original", "updated")))
 
       val Some(backAgain) = dao.getNodeById(updated.id)
 
       backAgain shouldBe updated
     }
-    "be remove node propertie in an update" in {
+    "be remove node properties in an update" in {
       val originalNode = "deleteProps".asNode + ("original", "property")
       dao.save(originalNode)
       val updated = originalNode.copy(properties = Map("new" -> NodeField("prop")))
