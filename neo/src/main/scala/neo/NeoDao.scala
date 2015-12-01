@@ -4,7 +4,6 @@ import java.util.UUID
 
 import com.typesafe.config.Config
 import neo.CypherOps._
-import neo.NodeField
 import org.anormcypher._
 
 import scala.compat.Platform.EOL
@@ -14,6 +13,8 @@ trait NeoDao {
   def getNodeById(id: UUID): Option[NodeRecord] = getNodesById(Set(id)).get(id)
 
   def getNodesById(ids: Set[UUID]): Map[UUID, NodeRecord]
+
+  def deleteNodes(ids: Set[UUID]): Unit
 
   def save(nodes: Seq[NodeRecord], relationships: Seq[NodeRelationship]): Unit
 
@@ -40,31 +41,54 @@ object NeoDao {
       Success(record)
     }
 
+    override def deleteNodes(ids: Set[UUID]): Unit = {
+      val queries = ids.map(id => s"""
+                     |MATCH (n {${NodeRecord.IdColumnName} : "${id}"})
+                     |DELETE n
+            """.stripMargin)
+      val success = queries.map(q => CypherStatement(q).execute).forall(_.booleanValue())
+      require(success)
+    }
     override def save(nodes: Seq[NodeRecord], relationships: Seq[NodeRelationship]) = {
 
       val allIds = nodes.map(_.id).toSet
       val byId = getNodesById(allIds)
 
+      println(s"Found ${byId.mkString(EOL, EOL, EOL)}")
+
       val oldRecords = allIds.flatMap(byId.get)
       val newIds = allIds -- byId.keySet
       val newNodes = nodes.filter(n ⇒ newIds.contains(n.id))
+
+      val nodesToUpdate = nodes.filter(n => oldRecords.exists(_.id == n.id))
+
+      println(s"Saving ${nodes.size} nodes will create ${newNodes.size} new nodes and update ${nodesToUpdate.size} nodes")
+      require(relationships.isEmpty, "TODO - save relationships")
+
       create(newNodes)
-
-
+      update(nodesToUpdate)
     }
 
     def update(nodes: Seq[NodeRecord]) = {
 
       val nodeStatements: Seq[Boolean] = nodes.map {
         case NodeRecord(id, labels, properties) =>
-          val formattedProperties: Map[String, String] = properties.mapValues(CypherFormatter.formatField)
-          val params: Map[String, Any] = Map("props" -> formattedProperties)
-          val statement = CypherStatement(
-            s"""
-               |MATCH (n {_id : "${id}"})
-               |SET n = { props }
-               |RETURN n
-            """.stripMargin, params)
+          val formattedProperties: Map[String, String] = {
+            val allProps = properties + (NodeRecord.IdColumnName -> StringField(id.toString))
+            allProps.mapValues(CypherFormatter.formatField)
+          }
+          val props = formattedProperties.map{
+            case (k,v) => s"$k : $v"
+          }.mkString("," + EOL)
+
+          val query = s"""
+                         |MATCH (n {${NodeRecord.IdColumnName} : "${id}"})
+                         |SET n = { $props }
+                         |RETURN n
+            """.stripMargin
+
+          println(query)
+          val statement = CypherStatement(query)
           statement.execute()
       }
       val r: Seq[Boolean] = nodeStatements
@@ -72,9 +96,11 @@ object NeoDao {
     }
 
     def create(nodes: Seq[NodeRecord]) = {
-      val nodeStatements = nodes.map(CypherFormatter.createCypher).mkString(EOL)
-      val r = CypherStatement(nodeStatements).execute()
-      require(r)
+      if (nodes.nonEmpty) {
+        val nodeStatements = nodes.map(CypherFormatter.createCypher).mkString(EOL)
+        val r = CypherStatement(nodeStatements).execute()
+        require(r, s"Create failed for $nodes")
+      }
     }
 
     override def getNodesById(ids: Set[UUID]): Map[UUID, NodeRecord] = {
@@ -98,8 +124,5 @@ object NeoDao {
       results.map(r => r.id -> r).toMap
 
     }
-
-
   }
-
 }

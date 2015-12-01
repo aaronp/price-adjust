@@ -19,6 +19,7 @@ object CypherFormatter {
       case DateField(epoch) => epoch.toString
       //        case IntField(x) => x.toString
       case LongField(x) => x.toString
+      case DecimalField(x) => x.toString
     }
   }
 }

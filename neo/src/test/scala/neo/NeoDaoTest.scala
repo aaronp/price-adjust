@@ -18,8 +18,13 @@ class NeoDaoTest extends WordSpec with Matchers with NeoImplicits {
     "be able to update a node" in {
       val originalNode = "updateMe".asNode.withLabels("original", "test") + ("foo", "bar") + ("small", Long.MinValue) + ("big", Long.MaxValue)
       dao.save(originalNode)
+      val Some(readOriginal) = dao.getNodeById(originalNode.id)
+      readOriginal shouldBe (originalNode)
+
       val updated = originalNode + ("x", "y")
       dao.save(updated)
+
+      updated.id shouldBe (originalNode.id)
 
       val Some(backAgain) = dao.getNodeById(updated.id)
 
