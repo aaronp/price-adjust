@@ -2,10 +2,7 @@ name := MyBuild.NamePrefix + "root"
 
 version := "0.0.1"
 
-scalaVersion := "2.11.7"
-
-lazy val common = project.
-    settings(Common.settings: _*)
+scalaVersion := "2.11.8"
 
 lazy val api = project.
     settings(Common.settings: _*).
@@ -16,48 +13,37 @@ lazy val apiJson = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.apiJsonDependencies)
 
-lazy val client = project.
-    dependsOn(api).
-    settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.clientDependencies)
-
-lazy val domain = project.
-    dependsOn(api).
-    settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.domainDependencies)
-
 lazy val web = project.
-    dependsOn(api, common, domain % "test->test;compile->compile").
+    //dependsOn(api, domain % "test->test;compile->compile").
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.webDependencies).
     enablePlugins(PlayScala)
 
 lazy val spark = project.
-    dependsOn(api, common).
+    dependsOn(api).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.sparkDependencies)
 
 lazy val search = project.
-    dependsOn(api, common).
+    dependsOn(api).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.searchDependencies)
 
-lazy val neo = project.
-    in(file("neo")).
+lazy val graph = project.
+    in(file("graph")).
   settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.neoDependencies)
+  settings(libraryDependencies ++= Dependencies.graphDependencies)
 
-lazy val domainDao = project.
-    in(file("domain-dao")).
-    dependsOn(domain, common, neo).
+lazy val mongo = project.
+    in(file("mongo")).
     settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.domainDaoDependencies)
+    settings(libraryDependencies ++= Dependencies.mongoDependencies)
 
-lazy val domainJson = project.
-    in(file("domain-json")).
-    dependsOn(domain % "test->test;compile->compile", common).
+lazy val rest = project.
+    in(file("rest")).
+    dependsOn(api).
     settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.domainJsonDependencies)
+    settings(libraryDependencies ++= Dependencies.akkaHttpDependencies)
 
 lazy val root = (project in file(".")).
-    aggregate(api, common, neo, client, domain, domainJson, domainDao, web, search, spark)
+    aggregate(api, mongo, graph, rest, apiJson, web, rest, search, spark)

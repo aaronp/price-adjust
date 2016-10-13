@@ -3,41 +3,50 @@ import Keys._
 
 object Dependencies {
 
-  val slf4jVersion = "1.6.4"
-  val slf4jNop = "org.slf4j" % "slf4j-nop" % slf4jVersion
-  val sparkVersion = "1.4.1"
+  val logging = Seq(
+    "ch.qos.logback" %  "logback-classic" % "1.1.7",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0")
 
-  val commonDependencies: Seq[ModuleID] = Seq(
+  val sparkVersion = "2.0.1"
+
+  val circeVersion = "0.5.1"
+
+  val circeDependencies = Seq(
+    "io.circe" %% "circe-core",
+    "io.circe" %% "circe-generic",
+    "io.circe" %% "circe-parser"
+  ).map(_ % circeVersion)
+
+  val commonDependencies: Seq[ModuleID] = logging ++ Seq(
     "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-    slf4jNop,
-    "org.threeten" % "threetenbp" % "1.3",
     "junit" % "junit" % "4.12" % "test"
   )
 
-  val json : Seq[ModuleID] = Seq(
+  val json : Seq[ModuleID] = circeDependencies ++ Seq(
       "io.argonaut" %% "argonaut" % "6.0.4",
       "com.propensive" %% "rapture-json-argonaut" % "1.1.0",
       "com.typesafe.play" %% "play-json" % "2.4.2")
 
   val apiDependencies    : Seq[ModuleID] = commonDependencies
-  val domainDependencies : Seq[ModuleID] = commonDependencies
-  val clientDependencies : Seq[ModuleID] = commonDependencies
   val apiJsonDependencies: Seq[ModuleID] = commonDependencies ++ json
   val searchDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
-    "com.sksamuel.elastic4s" %% "elastic4s-core" %  "1.7.0",
-    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % "1.7.0" % "test"
+    "com.sksamuel.elastic4s" %% "elastic4s-core" %  "2.3.1",
+    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % "2.3.1" % "test"
   )
-  val domainJsonDependencies : Seq[ModuleID] = commonDependencies ++ json
-  val domainDaoDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
-    "org.mongodb" %% "casbah" % "2.8.2",
-    "com.github.fakemongo" % "fongo" % "2.0.1" % "test",
-    "org.anormcypher" %% "anormcypher" % "0.6.0"
+
+  val mongoDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
+    "org.mongodb" %% "casbah" % "3.1.1",
+    "com.github.fakemongo" % "fongo" % "2.0.6" % "test"
     // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
     // "eu.fakod" %% "neo4j-scala" % "0.3.0"
   )
-  val neoDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+  val graphDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
     "org.anormcypher" %% "anormcypher" % "0.6.0"
   )
+
+  val akkaHttpDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
+    "com.typesafe.akka" %% "akka-http-core" % "2.4.11",
+    "com.typesafe.akka" %% "akka-http-testkit" % "2.4.11")
 
   val sparkDependencies  : Seq[ModuleID] = commonDependencies ++ Seq(
     "org.apache.spark" %% "spark-core" % sparkVersion,
