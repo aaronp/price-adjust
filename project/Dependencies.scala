@@ -35,7 +35,8 @@ object Dependencies {
   )
 
   val mongoDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
-    "org.mongodb" %% "casbah" % "3.1.1",
+    //"org.mongodb" %% "casbah" % "3.1.1",
+    "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.1",
     "com.github.fakemongo" % "fongo" % "2.0.6" % "test"
     // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
     // "eu.fakod" %% "neo4j-scala" % "0.3.0"

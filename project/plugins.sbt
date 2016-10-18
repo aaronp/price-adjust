@@ -4,6 +4,10 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.0")
 // Coursier (https://github.com/alexarchambault/coursier#sbt-plugin)
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M14")
 
+
+// docker (https://github.com/marcuslonnberg/sbt-docker)
+addSbtPlugin("se.marcuslonnberg" % "sbt-docker" % "1.4.0")
+
 // web plugins
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.6")
