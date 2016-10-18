@@ -10,11 +10,12 @@ lazy val api = project.
 
 lazy val apiJson = project.
     in(file("api-json")).
+  dependsOn(api, api % "test->test;compile->compile").
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.apiJsonDependencies)
 
 lazy val web = project.
-    //dependsOn(api, domain % "test->test;compile->compile").
+    dependsOn(apiJson, apiJson % "test->test;compile->compile").
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.webDependencies).
     enablePlugins(PlayScala)
@@ -25,7 +26,7 @@ lazy val spark = project.
     settings(libraryDependencies ++= Dependencies.sparkDependencies)
 
 lazy val search = project.
-    dependsOn(api).
+    dependsOn(api, apiJson).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.searchDependencies)
 
@@ -35,13 +36,14 @@ lazy val graph = project.
   settings(libraryDependencies ++= Dependencies.graphDependencies)
 
 lazy val mongo = project.
+  dependsOn(api, apiJson).
     in(file("mongo")).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.mongoDependencies)
 
 lazy val rest = project.
     in(file("rest")).
-    dependsOn(api).
+    dependsOn(apiJson, mongo).
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.akkaHttpDependencies)
 
