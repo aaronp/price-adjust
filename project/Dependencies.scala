@@ -11,6 +11,8 @@ object Dependencies {
 
   val circeVersion = "0.5.1"
 
+  val typesafeConfig = "com.typesafe" % "config" % "1.3.1"
+
   val circeDependencies = Seq(
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
@@ -23,8 +25,6 @@ object Dependencies {
   )
 
   val json : Seq[ModuleID] = circeDependencies ++ Seq(
-      "io.argonaut" %% "argonaut" % "6.0.4",
-      "com.propensive" %% "rapture-json-argonaut" % "1.1.0",
       "com.typesafe.play" %% "play-json" % "2.4.2")
 
   val apiDependencies    : Seq[ModuleID] = commonDependencies
@@ -34,15 +34,17 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % "2.3.1" % "test"
   )
 
-  val mongoDependencies : Seq[ModuleID] = commonDependencies ++ Seq(
+  val mongoDependencies : Seq[ModuleID] = commonDependencies ++ circeDependencies ++ Seq(
     //"org.mongodb" %% "casbah" % "3.1.1",
-    "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.1",
-    "com.github.fakemongo" % "fongo" % "2.0.6" % "test"
+    "org.mongodb.scala" %% "mongo-scala-driver" % "1.0.1",
+    "com.github.fakemongo" % "fongo" % "2.0.6" % "test",
+    typesafeConfig
     // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
     // "eu.fakod" %% "neo4j-scala" % "0.3.0"
   )
   val graphDependencies: Seq[ModuleID] = commonDependencies ++ Seq(
-    "org.anormcypher" %% "anormcypher" % "0.6.0"
+    "org.anormcypher" %% "anormcypher" % "0.6.0",
+    typesafeConfig
   )
 
   val akkaHttpDependencies: Seq[ModuleID] = commonDependencies ++ Seq(

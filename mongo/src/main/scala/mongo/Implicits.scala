@@ -1,9 +1,11 @@
 package mongo
 
 import api.service.json.JsonSupport
-import com.mongodb.casbah.Imports._
-import io.circe.{Json, Encoder}
+import com.mongodb.{DBCollection, DBCursor, DBObject}
+import io.circe.{Encoder, Json}
 
+import org.mongodb.scala.MongoClient
+import scala.collection.JavaConverters
 import scala.reflect.ClassTag
 
 /**
@@ -15,24 +17,49 @@ import scala.reflect.ClassTag
   */
 object Implicits {
 
-  implicit class ClientOps(val client: MongoClient) extends AnyVal {
-    def openDatabase(name: String): MongoOps = client(name)
+  implicit class RichString(val host: String) extends AnyVal {
+
+    def withPort(port: Int) = {
+      val mongoClient = MongoClient(host, port)
+      new RichClient(mongoClient)
+    }
   }
 
+  implicit class RichClient(val mongoClient: MongoClient) extends AnyVal {
+    def db(name: String) = new RichDB(mongoClient.getDB(name))
 
-  implicit class CollectionOps(val col: MongoCollection) extends AnyVal {
-    def upsert[A : Encoder](value : A) = {
-      import JsonSupport._
-      val json: Json = toJson(value)
-      val obj = MongoDBObject()
+    def dbNames = {
+      mongoClient.getDatabaseNames.toSet
+    }
+  }
+
+  implicit class RichDB(val mongo: MongoDB) extends AnyVal {
+    def collection[T: ClassTag]: RichCollection = collection(collectionName[T])
+
+    def collection(name: String): RichCollection = mongo.getCollection(name)
+
+    def collections = mongo.getCollectionNames.toSet
+  }
+
+  implicit class RichCollection(val collection: DBCollection) extends AnyVal {
+
+    def find[T <% DBObject, R: Unmarshaller](criteria: T) = {
+      val found: DBCursor = collection.find(criteria)
+      val objs = JavaConverters.iterableAsScalaIterableConverter(found).asScala
+      val u = implicitly[Unmarshaller[R]]
+      objs.map(u.unmarshal)
     }
 
+    def insert[T <% DBObject](doc: T) = {
+      collection.insert(doc)
+    }
   }
 
-  implicit class MongoOps(val db: MongoDB) extends AnyVal {
-    def collectionName[A: ClassTag] = implicitly[ClassTag[A]].runtimeClass.getSimpleName.filter(_.isLetterOrDigit).toLowerCase
+  implicit def stringToDBObj(json: String) = MongoJson.dbObjectFromJsonString(json)
 
-    def collection[A: ClassTag]: CollectionOps = db(collectionName)
-  }
+  implicit def jsonToDBObj(json: Json) = MongoJson.dbObjectFromJson(json)
 
+  implicit def objToDBObj[T: Encoder](obj: T) = jsonToDBObj(JsonSupport.toJson(obj))
+
+  def collectionName[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass.getSimpleName.filter(_.isLetterOrDigit).toLowerCase()
 }
