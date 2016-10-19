@@ -17,6 +17,9 @@ trait JsonSupport {
   implicit val prefsDecoder: Decoder[Preferences] = deriveDecoder
   implicit val prefsEncoder: Encoder[Preferences] = deriveEncoder
 
+  implicit val keyDecoder: Decoder[PreferenceKey] = deriveDecoder
+  implicit val keyEncoder: Encoder[PreferenceKey] = deriveEncoder
+
   def toJson[A: Encoder](obj: A): Json = obj.asJson
 
   def toJsonString[A: Encoder](obj: A) = toJson(obj).noSpaces

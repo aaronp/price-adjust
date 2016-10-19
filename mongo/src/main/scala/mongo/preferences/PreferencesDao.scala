@@ -1,7 +1,6 @@
 package mongo.preferences
 
 import api.service.{PreferenceKey, PreferenceService, Preferences}
-import com.mongodb.DBCollection
 import mongo.Implicits
 import mongo.Implicits.RichCollection
 

@@ -1,13 +1,11 @@
 package mongo
 
 import api.service.json.JsonSupport
-
-import scala.concurrent.Future
-
-//import com.mongodb.{DBCollection, DBCursor, DBObject}
 import io.circe.{Encoder, Json}
 import org.mongodb.scala._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 /**
@@ -27,7 +25,7 @@ object Implicits {
     }
   }
 
-  implicit class RichObservable[T](val obs : Observable[T]) extends AnyVal {
+  implicit class RichObservable[T](val obs: Observable[T]) extends AnyVal {
     def future: Future[List[T]] = {
       val f = Observables.futureObserver[T]
       obs.subscribe(f)
@@ -37,6 +35,7 @@ object Implicits {
 
   implicit class RichClient(val mongoClient: MongoClient) extends AnyVal {
     def db(name: String) = new RichDB(mongoClient.getDatabase(name))
+
     def dbNames = mongoClient.listDatabaseNames().future
   }
 
@@ -70,5 +69,8 @@ object Implicits {
 
   implicit def objToDBObj[T: Encoder](obj: T) = jsonToDBObj(JsonSupport.toJson(obj))
 
-  def collectionName[T: ClassTag] = implicitly[ClassTag[T]].runtimeClass.getSimpleName.filter(_.isLetterOrDigit).toLowerCase()
+  def collectionName[T: ClassTag]: String = {
+    val name: String = implicitly[ClassTag[T]].runtimeClass.getSimpleName
+    augmentString(name).filter(_.isLetterOrDigit).toLowerCase()
+  }
 }
