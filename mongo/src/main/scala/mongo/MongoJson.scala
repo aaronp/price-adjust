@@ -1,7 +1,7 @@
 package mongo
 
-import com.mongodb.{BasicDBObject, DBObject}
 import io.circe.Json
+import org.mongodb.scala.Document
 
 object MongoJson {
 
@@ -9,17 +9,18 @@ object MongoJson {
    * TODO - instead of going Json => String => Document, parse directly
    */
   def dbObjectFromJsonString(json: String) = {
-    val obj = BasicDBObject.parse(json)
-    if (!obj.containsField("_id")) {
-      require(obj.containsField("id"), s"no 'id' or '_id' field found on $json")
-      val id: AnyRef = obj.get("id")
-      obj.put("_id", id)
-      obj.remove("id")
+    val obj: Document = Document(json)
+    if (!obj.contains("_id")) {
+      val updated = obj.get("id").map { id =>
+        obj.updated("_id", id)
+      }
+      updated.getOrElse(sys.error(s"no 'id' or '_id' field found on $json"))
+    } else {
+      obj
     }
-    obj
   }
 
-  def dbObjectFromJson(json: Json): DBObject = {
+  def dbObjectFromJson(json: Json): Document = {
     dbObjectFromJsonString(json.toString())
     //    json.fold(
     //      Xor.Left("json wasn't an array or document: $json"),

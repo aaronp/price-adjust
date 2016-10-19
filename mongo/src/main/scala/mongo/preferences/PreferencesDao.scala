@@ -16,7 +16,7 @@ object PreferencesDao {
     new MongoPreference(coll)
   }
 
-  def apply(collection: DBCollection) : PreferencesDao = new MongoPreference(collection)
+//  def apply(collection: DBCollection) : PreferencesDao = new MongoPreference(collection)
   def apply(collection: RichCollection) : PreferencesDao = new MongoPreference(collection)
 
   class MongoPreference(preferencesCollection: RichCollection) extends PreferencesDao {

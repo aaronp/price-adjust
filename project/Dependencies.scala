@@ -38,6 +38,8 @@ object Dependencies {
     //"org.mongodb" %% "casbah" % "3.1.1",
     "org.mongodb.scala" %% "mongo-scala-driver" % "1.0.1",
     "com.github.fakemongo" % "fongo" % "2.0.6" % "test",
+    // this is 'provided' by fongo, which we don't have
+    "org.mongodb" % "mongo-java-driver" % "3.2.2" % "test",
     typesafeConfig
     // "org.neo4j" % "neo4j-spatial-scala" % "0.1.0-SNAPSHOT",
     // "eu.fakod" %% "neo4j-scala" % "0.3.0"

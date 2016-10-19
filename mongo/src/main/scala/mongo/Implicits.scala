@@ -1,11 +1,13 @@
 package mongo
 
 import api.service.json.JsonSupport
-import com.mongodb.{DBCollection, DBCursor, DBObject}
-import io.circe.{Encoder, Json}
 
-import org.mongodb.scala.MongoClient
-import scala.collection.JavaConverters
+import scala.concurrent.Future
+
+//import com.mongodb.{DBCollection, DBCursor, DBObject}
+import io.circe.{Encoder, Json}
+import org.mongodb.scala._
+
 import scala.reflect.ClassTag
 
 /**
@@ -20,38 +22,45 @@ object Implicits {
   implicit class RichString(val host: String) extends AnyVal {
 
     def withPort(port: Int) = {
-      val mongoClient = MongoClient(host, port)
+      val mongoClient: MongoClient = MongoClient(s"mongodb://$host:$port")
       new RichClient(mongoClient)
     }
   }
 
-  implicit class RichClient(val mongoClient: MongoClient) extends AnyVal {
-    def db(name: String) = new RichDB(mongoClient.getDB(name))
-
-    def dbNames = {
-      mongoClient.getDatabaseNames.toSet
+  implicit class RichObservable[T](val obs : Observable[T]) extends AnyVal {
+    def future: Future[List[T]] = {
+      val f = Observables.futureObserver[T]
+      obs.subscribe(f)
+      f.future
     }
   }
 
-  implicit class RichDB(val mongo: MongoDB) extends AnyVal {
+  implicit class RichClient(val mongoClient: MongoClient) extends AnyVal {
+    def db(name: String) = new RichDB(mongoClient.getDatabase(name))
+    def dbNames = mongoClient.listDatabaseNames().future
+  }
+
+  implicit class RichDB(val mongo: MongoDatabase) extends AnyVal {
     def collection[T: ClassTag]: RichCollection = collection(collectionName[T])
 
-    def collection(name: String): RichCollection = mongo.getCollection(name)
-
-    def collections = mongo.getCollectionNames.toSet
-  }
-
-  implicit class RichCollection(val collection: DBCollection) extends AnyVal {
-
-    def find[T <% DBObject, R: Unmarshaller](criteria: T) = {
-      val found: DBCursor = collection.find(criteria)
-      val objs = JavaConverters.iterableAsScalaIterableConverter(found).asScala
-      val u = implicitly[Unmarshaller[R]]
-      objs.map(u.unmarshal)
+    def collection(name: String): RichCollection = {
+      mongo.getCollection(name)
     }
 
-    def insert[T <% DBObject](doc: T) = {
-      collection.insert(doc)
+    def collections = mongo.listCollectionNames().future
+  }
+
+  implicit class RichCollection(val collection: MongoCollection[Document]) extends AnyVal {
+
+    def find[T <% Document, R: Unmarshaller](criteria: T): Future[List[R]] = {
+      val found: FindObservable[Document] = collection.find(criteria)
+      val u = implicitly[Unmarshaller[R]]
+      found.future.map(_.map(u.unmarshal))
+    }
+
+    def insert[T <% Document](doc: T): Future[Boolean] = {
+      val x: Observable[Completed] = collection.insertOne(doc)
+      x.future.map(_ => true)
     }
   }
 
