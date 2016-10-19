@@ -25,7 +25,7 @@ object Dependencies {
   )
 
   val json : Seq[ModuleID] = circeDependencies ++ Seq(
-      "com.typesafe.play" %% "play-json" % "2.4.2")
+      "com.typesafe.play" %% "play-json" % "2.5.2")
 
   val apiDependencies    : Seq[ModuleID] = commonDependencies
   val apiJsonDependencies: Seq[ModuleID] = commonDependencies ++ json
