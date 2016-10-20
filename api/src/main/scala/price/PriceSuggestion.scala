@@ -9,23 +9,27 @@ trait PriceSuggestion {
 
 object PriceSuggestion {
 
-  class Suggestion(range: PriceRange, points: PricePoint) extends PriceSuggestion {
-    private val validChanges = {
-      val ints = (1 to 9).filter(points.contains)
-      ints.flatMap { i =>
-        Set(i, i * -1)
-      }
+  private val ValidChanges = {
+    (1 to 9).toStream.flatMap { i =>
+      Set(i, i * -1)
     }
+  }
+
+  class Suggestion(range: PriceRange, points: PricePoint) extends PriceSuggestion {
 
     override def suggestPrice[T: Fractional](priceInPounds: T): Option[T] = {
       val pence = Price.asPence(priceInPounds)
-      val prices: Iterator[Pence] = for {
-        incOrDec <- validChanges.iterator
+      val prices: Stream[Pence] = for {
+        incOrDec <- ValidChanges
         newPrice = pence + incOrDec
+        _ = println(s"$pence + $incOrDec = $newPrice .... valid range? ${range.within(newPrice)} valid price? ${points.contains(newPrice)}")
         if range.within(newPrice)
+        if points.contains(newPrice)
       } yield newPrice
 
-      val firstInPence: Option[Pence] = prices.toStream.headOption
+      println(prices.mkString(","))
+      println()
+      val firstInPence: Option[Pence] = prices.headOption
       firstInPence.map { pence =>
         Price.fromPence[T](pence)
       }

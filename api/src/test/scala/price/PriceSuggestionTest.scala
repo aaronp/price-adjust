@@ -4,18 +4,20 @@ import org.scalatest.{Matchers, WordSpec}
 
 class PriceSuggestionTest extends WordSpec with Matchers {
 
+  import Price.Implicits._
+
+  val points = PricePoint(2, 3, 7)
+  val range = PriceRange(2.89, 2.97)
+  val suggester = PriceSuggestion(range, points)
+
   "PriceSuggestion.suggestPrice" should {
-    import Price.Implicits._
-    val points = PricePoint(2, 3, 7)
-    val range = PriceRange(2.89, 2.97)
-    val suggester = PriceSuggestion(range, points)
 
     val testCases = Seq(
-      (2.86, Set(2.89)),
-      (2.87, Set(2.89)),
-      (2.88, Set(2.89)),
+      (2.86, Set(2.92)),
+      (2.87, Set(2.92)),
+      (2.88, Set(2.92)),
       (2.89, Set(2.92)),
-      (2.90, Set(2.89)),
+      (2.90, Set(2.92)),
       (2.91, Set(2.92)),
       (2.92, Set(2.93)),
       (2.94, Set(2.93)),
