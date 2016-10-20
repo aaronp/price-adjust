@@ -6,15 +6,15 @@ import scala.math._
 
 class PriceTest extends WordSpec with Matchers {
 
-  "Rules.fromPence" should {
+  "Price.fromPence" should {
     "convert pence to a big decimal" in {
-      Price.fromPence[BigDecimal](123) shouldBe BigDecimal ("1.23")
+      Price.fromPence[BigDecimal](123) shouldBe BigDecimal("1.23")
     }
     "convert pence to a double" in {
       Price.fromPence[Double](123) shouldBe 1.23
     }
   }
-  "Rules.asPence" should {
+  "Price.asPence" should {
     "convert a big decimal to pence" in {
       Price.asPence(BigDecimal("1.23456")) shouldBe 123
     }
