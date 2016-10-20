@@ -21,7 +21,7 @@ lazy val web = project.
     enablePlugins(PlayScala)
 
 lazy val spark = project.
-    dependsOn(api).
+    dependsOn(api, api % "test->test;compile->compile").
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.sparkDependencies)
 

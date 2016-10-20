@@ -7,14 +7,11 @@ import org.scalatest.{Matchers, WordSpec}
 
 class ProductPriceFormatterTest extends WordSpec with Matchers {
 
+  import ProductPriceFormatterTest._
   "ProductPriceFormatter.run" should {
     "work" in {
-      val args = List("products.csv", "points.txt").map { fileName =>
-        val res: URL = getClass.getClassLoader.getResource(fileName)
-        val path = Paths.get(res.toURI)
-        path.toString
-      }
-      val Right(output) = ProductPriceFormatter.runWithArgs(args)
+
+      val Right(output) = ProductPriceFormatter.runWithArgs(List(productPath, pointsPath))
 
       val expectedOutput = """Product, Original Price, Min Price, Max Price, New Price
                              |A, 2.91, 2.89, 2.97, 2.92
@@ -23,5 +20,15 @@ class ProductPriceFormatterTest extends WordSpec with Matchers {
 
       output shouldBe expectedOutput
     }
+  }
+}
+
+
+object ProductPriceFormatterTest {
+
+  val List(productPath, pointsPath) = List("products.csv", "points.txt").map { fileName =>
+    val res: URL = getClass.getClassLoader.getResource(fileName)
+    val path = Paths.get(res.toURI)
+    path.toString
   }
 }
