@@ -8,34 +8,35 @@ import scala.util.Try
 
 object ProductPriceFormatter {
 
-  object Args {
+  private object Args {
     private def lines(fileName: String): Option[List[String]] = {
-      Try {
+      try {
         val src = Source.fromFile(fileName)
-        try {
+        val lines = try {
           src.getLines().toList
         } finally {
           src.close
         }
-      }.toOption
+        Option(lines)
+      } catch {
+        case _ => None
+      }
     }
+
+    private def asInt(s: String) = Try(s.toInt).toOption
 
     object PricePointsFromFile {
       def unapply(fileName: String): Option[PricePoint] = {
-        lines(fileName).map { lines =>
-          PricePoint(lines.map(_.toInt).toSet)
-        }
+        val points: Option[Set[Pence]] = lines(fileName).map(_.flatMap(asInt).toSet)
+        points.map(PricePoint.apply)
       }
     }
 
     object Products {
       def unapply(fileName: String): Option[List[Product[Double]]] = {
-        Try {
-          val src = Source.fromFile(fileName)
-          src.getLines.toList.collect {
-            case Product(p) => p
-          }
-        }.toOption
+        lines(fileName).map { all =>
+          all.collect { case Product(p) => p }
+        }
       }
     }
 
@@ -46,12 +47,15 @@ object ProductPriceFormatter {
       case List(Args.Products(lines), Args.PricePointsFromFile(points)) =>
         implicit val showOpt: Show[Option[Double]] = Show.optShow[Double]("No price point within min/ / max range")
         implicit object showLine extends Show[(String, Product[Double])] {
-          override def show(priceAndProduct : (String, Product[Double])) = {
-            ""
+          override def show(priceAndProduct: (String, Product[Double])) = {
+            val (price, product) = priceAndProduct
+            import product._
+            s"$name, $originalPrice, $minPrice, $maxPrice, $price"
           }
         }
         val suggestions = apply(lines, points)
-        Right(suggestions.mkString(Platform.EOL))
+        val header = "Product, Original Price, Min Price, Max Price, New Price"
+        Right((header +: suggestions).mkString(Platform.EOL))
       case other => Left(other)
     }
 

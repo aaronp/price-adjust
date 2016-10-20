@@ -22,13 +22,10 @@ object PriceSuggestion {
       val prices: Stream[Pence] = for {
         incOrDec <- ValidChanges
         newPrice = pence + incOrDec
-        _ = println(s"$pence + $incOrDec = $newPrice .... valid range? ${range.within(newPrice)} valid price? ${points.contains(newPrice)}")
         if range.within(newPrice)
         if points.contains(newPrice)
       } yield newPrice
 
-      println(prices.mkString(","))
-      println()
       val firstInPence: Option[Pence] = prices.headOption
       firstInPence.map { pence =>
         Price.fromPence[T](pence)
