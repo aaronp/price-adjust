@@ -8,7 +8,7 @@ import scala.util.Try
 
 object ProductPriceFormatter {
 
-  private object Args {
+  object Args {
     private def lines(fileName: String): Option[List[String]] = {
       try {
         val src = Source.fromFile(fileName)
@@ -45,7 +45,7 @@ object ProductPriceFormatter {
   def runWithArgs(userArgs: List[String]): Either[Any, String] = {
     userArgs match {
       case List(Args.Products(lines), Args.PricePointsFromFile(points)) =>
-        implicit val showOpt: Show[Option[Double]] = Show.optShow[Double]("No price point within min/ / max range")
+        implicit val showOpt: Show[Option[Double]] = Show.optShow[Double]("No price point within min / max range")
         implicit object showLine extends Show[(String, Product[Double])] {
           override def show(priceAndProduct: (String, Product[Double])) = {
             val (price, product) = priceAndProduct

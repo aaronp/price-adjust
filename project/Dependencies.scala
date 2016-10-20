@@ -7,8 +7,6 @@ object Dependencies {
     "ch.qos.logback" %  "logback-classic" % "1.1.7",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0")
 
-  val sparkVersion = "2.0.1"
-
   val circeVersion = "0.5.1"
 
   val typesafeConfig = "com.typesafe" % "config" % "1.3.1"
@@ -54,10 +52,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-http-testkit" % "2.4.11")
 
   val sparkDependencies  : Seq[ModuleID] = commonDependencies ++ Seq(
-    "org.apache.spark" %% "spark-core" % sparkVersion,
-    "org.apache.spark" %% "spark-sql" % sparkVersion,
-    "org.apache.spark" %% "spark-mllib" % sparkVersion,
-    "org.apache.spark" %% "spark-streaming" % sparkVersion)
+    "org.apache.spark" %% "spark-core").map(_ % "2.0.1")
   val webDependencies    : Seq[ModuleID] = commonDependencies ++ {
     Seq(
       play.sbt.PlayImport.cache,
