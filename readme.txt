@@ -1,7 +1,9 @@
-SBT Notes:
+This project is built with sbt.
 
-http://www.scala-sbt.org/release/tutorial/Multi-Project.html
+The main data structures and functions are in the 'api' subproject.
 
-http://stackoverflow.com/questions/23188771/confused-how-to-setup-a-multi-project-sbt-project
+The 'spark' subproject contains some Spark functionality to exploit the API on a spark cluster.
 
-http://jsuereth.com/scala/2013/06/11/effective-sbt.html
+To build/test:
+
+sbt test
