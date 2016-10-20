@@ -1,4 +1,4 @@
-package api.service.json
+package price.json
 
 import api.service.Preferences
 import org.scalatest._

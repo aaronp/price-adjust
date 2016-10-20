@@ -25,27 +25,5 @@ lazy val spark = project.
     settings(Common.settings: _*).
     settings(libraryDependencies ++= Dependencies.sparkDependencies)
 
-lazy val search = project.
-    dependsOn(api, apiJson).
-    settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.searchDependencies)
-
-lazy val graph = project.
-    in(file("graph")).
-  settings(Common.settings: _*).
-  settings(libraryDependencies ++= Dependencies.graphDependencies)
-
-lazy val mongo = project.
-  dependsOn(api, apiJson).
-    in(file("mongo")).
-    settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.mongoDependencies)
-
-lazy val rest = project.
-    in(file("rest")).
-    dependsOn(apiJson, mongo).
-    settings(Common.settings: _*).
-    settings(libraryDependencies ++= Dependencies.akkaHttpDependencies)
-
 lazy val root = (project in file(".")).
-    aggregate(api, mongo, graph, rest, apiJson, web, rest, search, spark)
+    aggregate(api, apiJson, web, spark)

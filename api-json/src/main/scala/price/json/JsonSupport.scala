@@ -1,5 +1,4 @@
-package api.service
-package json
+package price.json
 
 import cats.data.Xor._
 import io.circe._
